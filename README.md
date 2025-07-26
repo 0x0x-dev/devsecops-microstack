@@ -1,36 +1,32 @@
 # 🚀 Dockerized DevSecOps Demo – Node.js + PostgreSQL + Nginx
 
 A fully Dockerized Node.js CRUD API connected to PostgreSQL, reverse-proxied with Nginx.  
-Built for demonstrating DevSecOps fundamentals, security testing, and production-grade architecture.  
+Designed to demonstrate DevSecOps fundamentals, security testing, and production-grade architecture.  
 Includes ready-to-use CI/CD pipelines with SAST (Semgrep) and DAST (OWASP ZAP) security automation.
 
 ---
 
-## 🧱 Stack
+## 🧱 Tech Stack
 
-- **Backend:** Node.js + Express
+- **Backend:** Node.js (Express)
 - **Database:** PostgreSQL
 - **Proxy:** Nginx
 - **Containers:** Docker & Docker Compose
-- **Security:** Semgrep (SAST), OWASP ZAP (DAST), GitHub Actions CI/CD
+- **Security:** Semgrep (SAST), OWASP ZAP (DAST)
+- **CI/CD:** GitHub Actions
 
 ---
 
 ## ✨ Features
-- ✅ Node.js REST API with Express
-- ✅ PostgreSQL database with Docker
-- ✅ Nginx reverse proxy for routing
-- ✅ Docker Compose for multi-container setup
-- ✅ Semgrep for static code analysis
-- ✅ OWASP ZAP for dynamic security testing
-- ✅ GitHub Actions for CI/CD pipeline
-- ✅ Basic Tailwind CSS frontend
-- ✅ CRUD API (`/users`) using PostgreSQL
-- ✅ RESTful endpoints (Create, Read, Update, Delete)
-- ✅ Nginx reverse proxy for routing
-- ✅ Multi-service `docker-compose` setup
-- ✅ Environment variable-based config
-- ✅ gitignore for sensitive files
+
+- CRUD API (`/users`) with PostgreSQL
+- RESTful endpoints (Create, Read, Update, Delete)
+- Nginx reverse proxy for secure routing
+- Multi-service orchestration with Docker Compose
+- Environment variable-based configuration
+- Basic Tailwind CSS frontend
+- Automated SAST & DAST in CI/CD pipeline
+- Security reports as downloadable artifacts
 
 ---
 
@@ -38,14 +34,14 @@ Includes ready-to-use CI/CD pipelines with SAST (Semgrep) and DAST (OWASP ZAP) s
 
 ```
 project-root/
-├── .github/workflows/
-│   ├── security.yml
-├── public/
-│   ├── index.html
+├── .github/workflows/      # CI/CD workflows
+│   └── security.yml
+├── public/                 # Frontend files
+│   └── index.html
 ├── .gitignore
 ├── Dockerfile
 ├── docker-compose.yml
-├── index.js
+├── index.js                # Express app
 ├── package.json
 ├── nginx.conf
 └── README.md
@@ -53,40 +49,38 @@ project-root/
 
 ---
 
-## ⚙️ How to Run
+## ⚙️ Getting Started
 
-> Make sure Docker & Docker Compose are installed.
+> Prerequisites: [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/install/)
 
 ```bash
 # Build and start all services
 docker-compose up --build
 ```
 
-Once running:
+- App: [http://localhost:3000](http://localhost:3000)
+- Nginx (reverse proxy): [http://localhost](http://localhost)
+- API: [http://localhost/users](http://localhost/users)
 
-- App: http://localhost:3000
-- DB: http://localhost:5432 (PostgreSQL)
-- Nginx: http://localhost (reverse proxy)  
-- API: http://localhost/users  
 ---
 
 ## 📮 API Endpoints
 
-| Method | Route           | Description           |
-|--------|------------------|-----------------------|
-| GET    | `/users`         | Get all users         |
-| POST   | `/users`         | Add new user          |
-| PUT    | `/users/:id`     | Update user by ID     |
-| DELETE | `/users/:id`     | Delete user by ID     |
-| GET    | `/search?q=term` | Search users by term  |
-| GET    | `/debug`         | Debug info            |
-| GET    | `/health` | Local File Inclusion test |
+| Method | Route               | Description                  |
+|--------|---------------------|------------------------------|
+| GET    | `/users`            | Get all users                |
+| POST   | `/users`            | Add new user                 |
+| PUT    | `/users/:id`        | Update user by ID            |
+| DELETE | `/users/:id`        | Delete user by ID            |
+| GET    | `/search?q=term`    | Search users by name (XSS)   |
+| GET    | `/debug`            | Debug info (Sensitive data)  |
+| GET    | `/health`           | Health check endpoint        |
 
 ---
 
 ## 🛠 Environment Variables
 
-Set inside `docker-compose.yml`:
+Configured in `docker-compose.yml`:
 
 ```yaml
 DB_HOST=db
@@ -96,16 +90,10 @@ DB_NAME=mydb
 ```
 
 ---
-## 🛡️ Security Testing
-- **SAST:** Uses Semgrep to analyze code for vulnerabilities.
-- **DAST:** Uses OWASP ZAP to perform dynamic security testing on the running application.
-- **GitHub Actions:** Automates security scans on every push and pull request.
-- **ZAP Scan Report:** Generated in JSON format and uploaded as an artifact.
-- **Semgrep Report:** Generated in JSON format and uploaded as an artifact.
 
----
+## 🛡️ Security & DevSecOps
 
-
-## 🧑‍💻 Author
-
-Built with ❤️ by Moaaz
+- **SAST:** Semgrep scans source code for vulnerabilities in CI.
+- **DAST:** OWASP ZAP scans the running app for web vulnerabilities in CI.
+- **CI/CD:** Automated with GitHub Actions on every push and PR.
+- **Reports:** ZAP and Semgrep reports are generated and uploaded as artifacts.
