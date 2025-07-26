@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management UI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6 text-center">User Management</h1>
+    <form id="userForm" class="flex gap-4 mb-6 justify-center">
+      <input type="text" id="name" placeholder="Name" class="px-4 py-2 border rounded" required>
+      <input type="email" id="email" placeholder="Email" class="px-4 py-2 border rounded" required>
+      <button type="submit" id="submitBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Add User</button>
+      <button type="button" id="cancelEditBtn" class="bg-gray-500 text-white px-4 py-2 rounded hidden">Cancel</button>
+    </form>
+    <form action="/search" method="GET" class="flex gap-4 mb-6 justify-center">
+      <input type="text" name="q" placeholder="Search users (XSS vulnerable)" class="px-4 py-2 border rounded">
+      <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Search</button>
+    </form>
+    <div class="bg-white shadow rounded p-6">
+      <table class="w-full text-left">
+        <thead>
+          <tr>
+            <th class="py-2">ID</th>
+            <th class="py-2">Name</th>
+            <th class="py-2">Email</th>
+            <th class="py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    let editUserId = null;
+
+    async function fetchUsers() {
+      const res = await fetch('/users');
+      const users = await res.json();
+      const table = document.getElementById('usersTable');
+      table.innerHTML = '';
+      users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="py-2">${user.id}</td>
+          <td class="py-2">${user.name}</td>
+          <td class="py-2">${user.email}</td>
+          <td class="py-2">
+            <button class="bg-red-500 text-white px-2 py-1 rounded delete-btn" data-id="${user.id}">Delete</button>
+            <button class="bg-yellow-500 text-white px-2 py-1 rounded edit-btn" data-id="${user.id}" data-name="${encodeURIComponent(user.name)}" data-email="${encodeURIComponent(user.email)}">Edit</button>
+          </td>
+        `;
+        table.appendChild(tr);
+      });
+
+      // Add event listeners for edit and delete buttons
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.onclick = function() {
+          const id = btn.getAttribute('data-id');
+          const name = decodeURIComponent(btn.getAttribute('data-name'));
+          const email = decodeURIComponent(btn.getAttribute('data-email'));
+          startEditUser(id, name, email);
+        };
+      });
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.onclick = function() {
+          const id = btn.getAttribute('data-id');
+          deleteUser(id);
+        };
+      });
+    }
+
+    document.getElementById('userForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      if (editUserId) {
+        await fetch(`/users/${editUserId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+        });
+        editUserId = null;
+        document.getElementById('submitBtn').textContent = 'Add User';
+        document.getElementById('cancelEditBtn').classList.add('hidden');
+      } else {
+        await fetch('/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+        });
+      }
+      document.getElementById('userForm').reset();
+      fetchUsers();
+    };
+
+
+    window.startEditUser = function(id, name, email) {
+      editUserId = id;
+      document.getElementById('name').value = decodeURIComponent(name);
+      document.getElementById('email').value = decodeURIComponent(email);
+      document.getElementById('submitBtn').textContent = 'Update User';
+      document.getElementById('cancelEditBtn').classList.remove('hidden');
+    };
+
+    document.getElementById('cancelEditBtn').onclick = function() {
+      editUserId = null;
+      document.getElementById('userForm').reset();
+      document.getElementById('submitBtn').textContent = 'Add User';
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+    };
+
+    window.deleteUser = async function(id) {
+      await fetch(`/users/${id}`, { method: 'DELETE' });
+      fetchUsers();
+    }
+
+    fetchUsers();
+  </script>
+</body>
+</html>
