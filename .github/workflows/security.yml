@@ -2,7 +2,7 @@ name: DevSecOps Pipeline
 
 on:
   push:
-    branches: [ devsecops ]
+    branches: [ main ]
   pull_request:
 
 jobs:
